@@ -1,9 +1,11 @@
 function NumberPlaceCreate() {
+  // 初始化参数
   const NumberList = [1, 2, 3, 4, 5, 6, 7, 8, 9]
   const NumberPlace = []
   const Maximum = 10
   const Calling = { y: 0, time: 0 }
 
+  // 每个数字建立
   function create(lastY) {
     // 位置循环
     for (let y = lastY || 1; y <= 9; y++) {
@@ -13,6 +15,7 @@ function NumberPlaceCreate() {
         Calling.time = 0
       }
 
+      // 逐个尝试
       for (let x = 1; x <= 9; x++) {
         const z = Math.ceil(x / 3) + (Math.floor((y - 1) / 3) * 3)
 
@@ -41,12 +44,12 @@ function NumberPlaceCreate() {
             for (let r = 0; r < 9; r++) {
               NumberPlace.pop()
             }
-            return NumberPlaceCreate(y - 1)
+            return create(y - 1)
           }
 
           // 重算次数累加
           Calling.time += 1
-          return NumberPlaceCreate(y)
+          return create(y)
         }
 
         // 选一个数字
