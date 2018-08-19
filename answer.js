@@ -1,13 +1,27 @@
+// 数独题目
 const question = [
-  [1, 0, 4, 5, 0, 3, 0, 2, 0],
-  [0, 0, 2, 4, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 6, 7],
-  [0, 8, 0, 0, 0, 0, 7, 4, 0],
-  [0, 0, 7, 2, 4, 0, 0, 5, 0],
-  [4, 0, 0, 0, 0, 5, 0, 0, 0],
-  [8, 0, 0, 0, 2, 0, 5, 0, 0],
-  [5, 0, 0, 0, 0, 0, 0, 1, 0],
-  [0, 3, 0, 6, 0, 1, 0, 0, 0]
+  [2, 0, 4, 0, 0, 0, 0, 0, 0],
+  [8, 1, 0, 2, 0, 0, 0, 0, 3],
+  [0, 9, 0, 4, 0, 7, 0, 0, 8],
+  [6, 0, 0, 0, 1, 0, 9, 0, 7],
+  [0, 0, 0, 0, 4, 0, 0, 0, 0],
+  [0, 0, 0, 7, 0, 0, 5, 0, 0],
+  [0, 0, 0, 0, 0, 0, 8, 0, 0],
+  [0, 0, 1, 0, 0, 3, 0, 7, 0],
+  [0, 0, 0, 0, 7, 1, 6, 0, 0]
+]
+
+// 不规则数独的z定位
+const questionZ = [
+  1, 1, 1, 2, 2, 2, 2, 3, 3,
+  1, 1, 1, 4, 2, 3, 3, 3, 3,
+  1, 4, 4, 4, 2, 2, 5, 5, 3,
+  1, 4, 4, 2, 2, 5, 5, 5, 3,
+  1, 4, 4, 5, 5, 5, 5, 6, 3,
+  7, 7, 4, 7, 6, 6, 6, 6, 6,
+  7, 7, 7, 7, 8, 8, 8, 8, 6,
+  7, 7, 9, 9, 9, 9, 8, 8, 6,
+  9, 9, 9, 9, 9, 8, 8, 8, 6
 ]
 
 function NumberPlaceAnswer() {
@@ -31,7 +45,12 @@ function NumberPlaceAnswer() {
       NumberPlace.push({
         x: x + 1,
         y: y + 1,
+        // 规则数独的z定位
         z: Math.ceil((x + 1) / 3) + (Math.floor(y / 3) * 3),
+        // 不规则数独的z定位
+        // z: questionZ[y * 9 + x],
+        // x 数独增加的额外参数
+        // s: x === y ? 1 : (x + y === 8 ? 2 : 0),
         num: number
       })
       NumberQuerstion.push(!!number)
@@ -61,6 +80,7 @@ function NumberPlaceAnswer() {
 
           if (numDel) numDel.num = 0
         }
+
         return setTimeout(() => {
           if (y !== 1) {
             Calling[y - 1].time += 1
@@ -89,6 +109,8 @@ function NumberPlaceAnswer() {
             num.x === numPlace.x ||
             num.y === numPlace.y ||
             num.z === numPlace.z
+            // x 数独增加的额外判断
+            // || (numPlace.s && num.s && num.s === numPlace.s)
           ) {
             const index = canBe.findIndex(number => number === num.num)
             if (index >= 0) canBe.splice(index, 1)
@@ -96,7 +118,7 @@ function NumberPlaceAnswer() {
         })
 
         // console.log(canBe)
-        // console.log(x, y, numPlace.z, NumberPlace.length)
+        // console.log(x, y, numPlace.z)
 
         // 某格没有可选数，本行重算
         if (canBe.length === 0) {
