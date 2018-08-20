@@ -39,15 +39,15 @@ const questionZ = [
 
 // 不规则数独的z定位
 const questionZPos = [
-  1, 1, 1, 2, 2, 2, 2, 3, 3,
-  1, 1, 1, 4, 2, 3, 3, 3, 3,
-  1, 4, 4, 4, 2, 2, 5, 5, 3,
-  1, 4, 4, 2, 2, 5, 5, 5, 3,
-  1, 4, 4, 5, 5, 5, 5, 6, 3,
-  7, 7, 4, 7, 6, 6, 6, 6, 6,
-  7, 7, 7, 7, 8, 8, 8, 8, 6,
-  7, 7, 9, 9, 9, 9, 8, 8, 6,
-  9, 9, 9, 9, 9, 8, 8, 8, 6
+  1, 1, 2, 2, 2, 2, 2, 2, 2,
+  3, 1, 1, 1, 2, 4, 4, 2, 4,
+  3, 1, 5, 1, 6, 6, 4, 4, 4,
+  3, 1, 5, 5, 5, 6, 4, 4, 4,
+  3, 1, 5, 6, 6, 6, 7, 7, 7,
+  3, 3, 5, 5, 8, 6, 6, 6, 7,
+  3, 5, 5, 8, 8, 7, 7, 7, 7,
+  3, 8, 8, 8, 8, 7, 9, 9, 9,
+  3, 8, 8, 9, 9, 9, 9, 9, 9
 ]
 
 /**
@@ -59,18 +59,14 @@ const questionZPos = [
  */
 function NumberPlaceAnswer(type = '') {
   // 1 初始化参数
+  // 可选数字
   const NumberList = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+  // 题目需要处理数组
+  const NumberNeedAnswer = []
+  // 题目非正确值缓存
+  const NumberIncorrect = []
+  // 最终结果
   const NumberPlace = []
-  const Maximum = 10
-  let CallingLine = 0
-  const Calling = (function() {
-    const obj = {}
-    for (let i = 1; i <= 9; i++) {
-      obj[i] = { time: 0 }
-    }
-    return obj
-  })()
-  const NumberQuerstion = []
 
   // 2 处理输入数字
   const question = (function() {
@@ -82,7 +78,7 @@ function NumberPlaceAnswer(type = '') {
 
   question.forEach((line, y) => {
     line.forEach((number, x) => {
-      NumberPlace.push({
+      const num = {
         x: x + 1,
         y: y + 1,
         z: !type.includes('z')
@@ -96,61 +92,59 @@ function NumberPlaceAnswer(type = '') {
           // x 数独增加的额外参数
           : x === y ? 1 : (x + y === 8 ? 2 : 0),
         num: number
-      })
-      NumberQuerstion.push(!!number)
+      }
+      NumberPlace.push(num)
     })
   })
 
+  NumberPlace.forEach(num => {
+    if (num.num) return
+    num.haschoose = new Set()
+    NumberPlace.forEach(numCheck => {
+      if (!numCheck.num) return
+      if (
+        numCheck.x === num.x ||
+        numCheck.y === num.y ||
+        numCheck.z === num.z
+        // x 数独增加的额外判断
+        || (
+          type.includes('x') &&
+          numCheck.s && num.s &&
+          numCheck.s === num.s
+        )
+      ) {
+        num.haschoose.add(numCheck.num)
+      }
+    })
+  })
+
+  NumberNeedAnswer.push(...NumberPlace
+    .filter(num => !num.num)
+    .sort((a, b) => b.haschoose.size - a.haschoose.size))
+
+  NumberIncorrect.push(...NumberNeedAnswer.map(() => new Set()))
+
   // 3 每个数字尝试
-  function answer(lastY) {
-    // 3.1 逐行尝试
-    for (let y = (lastY || lastY > 1) ? lastY : 1; y <= 9; y++) {
-      // 3.1.1 记录当前循环行
-      if (y > CallingLine) {
-        Calling[y].time = 0
-      }
+  /**
+   * 逐行逐个尝试数字的函数
+   *
+   * @param {Number} lastI 位置循环的起始，用于重算时的起始数
+   * @returns NumberPlace
+   */
+  function answer(lastI) {
+    // 3.1 逐个尝试
+    for (
+      let i = (lastI && lastI > 0) ? lastI: 0;
+      i < NumberNeedAnswer.length;
+      i++
+    ) {
+      const numPlace = NumberNeedAnswer[i]
 
-      if (y !== CallingLine) {
-        CallingLine = y
-      }
+      if (!NumberIncorrect[i].size) {
+        NumberIncorrect[i] = new Set(numPlace.haschoose)
+        for (let j = 0; j < i; j++) {
+          const num = NumberNeedAnswer[j]
 
-      // 3.1.2 如果重算次数大于阈值，删除上行数据，重算上一行
-      if (Calling[y].time >= Maximum) {
-        for (let r = 1; r <= 9; r++) {
-          const numDel = NumberPlace.find((num, numIndex) => (
-            !NumberQuerstion[numIndex] &&
-            num.x === r &&
-            num.y === y - 1
-          ))
-
-          if (numDel) numDel.num = 0
-        }
-
-        return setTimeout(() => {
-          if (y !== 1) {
-            Calling[y - 1].time += 1
-            answer(y - 1)
-          } else {
-            Calling[1].time = 0
-            answer()
-          }
-        }, 0)
-      }
-
-      // 3.1.3 逐个尝试
-      for (let x = 1; x <= 9; x++) {
-        const numPlace = NumberPlace.find(num => (
-          num.x === x && num.y === y
-        ))
-
-        // 有值跳过
-        if (numPlace.num) continue
-
-        // 本格子可选数字
-        const canBe = [...NumberList]
-
-        NumberPlace.forEach(num => {
-          if (!num.num) return
           if (
             num.x === numPlace.x ||
             num.y === numPlace.y ||
@@ -159,39 +153,34 @@ function NumberPlaceAnswer(type = '') {
             || (
               type.includes('x') &&
               numPlace.s && num.s &&
-              numPlace.s === num.s
+              num.s === numPlace.s
             )
           ) {
-            const index = canBe.findIndex(number => number === num.num)
-            if (index >= 0) canBe.splice(index, 1)
+            NumberIncorrect[i].add(num.num)
           }
-        })
-
-        // console.log(canBe)
-        // if (y > 7) console.log(x, y, numPlace.z)
-
-        // 某格没有可选数，本行重算
-        if (canBe.length === 0) {
-          // 删掉本行数据
-          for (let r = 1; r < x; r++) {
-            const numDel = NumberPlace.find((num, numIndex) => (
-              !NumberQuerstion[numIndex] &&
-              num.x === r &&
-              num.y === y
-            ))
-
-            if (numDel) numDel.num = 0
-          }
-
-          // 重算次数累加
-          Calling[y].time += 1
-          return answer(y)
         }
-
-        // 选一个数字
-        const index = Math.floor(Math.random() * canBe.length)
-        numPlace.num = canBe[index]
       }
+
+      if (NumberIncorrect[i].size === 9) {
+        if (i === 0) throw new Error('本题无解')
+
+        NumberIncorrect[i] = new Set()
+        NumberIncorrect[i - 1].add(NumberNeedAnswer[i - 1].num)
+        NumberNeedAnswer[i - 1].num = 0
+        return setTimeout(() => {
+          answer(i - 1)
+        }, 0)
+      }
+
+      const canBe = NumberList
+        .filter(number => !NumberIncorrect[i].has(number))
+      const index = Math.floor(Math.random() * canBe.length)
+      numPlace.num = canBe[index]
+
+      // if (i < 10) {
+      //   console.log(i)
+      //   console.log(canBe)
+      // }
     }
 
     // 3.2 渲染成表格
@@ -214,7 +203,7 @@ function NumberPlaceAnswer(type = '') {
     return NumberPlace
   }
 
-  //  4 执行
+  // 4 执行
   return answer()
 }
 
