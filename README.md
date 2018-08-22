@@ -13,15 +13,15 @@
 
 生成普通数独：
 
-* `[Done] exited with code=0 in 0.08 seconds`
+* `[Done] exited with code=0 in 0.075 seconds`
 
 解题算法可以解上面4种类型的数独，只不过解题时间递增（根据题目是否适合计算机穷举有关）：
 
-* [普通数独] `[Done] exited with code=0 in 7.891 seconds`
+* [普通数独] `[Done] exited with code=0 in 0.09 seconds`
 
-* [X对角线数独] `[Done] exited with code=0 in 212.434 seconds`
+* [X对角线数独] `[Done] exited with code=0 in 0.514 seconds`
 
-* [不规则数独] `[Done] exited with code=0 in 453.298 seconds`
+* [不规则数独] `[Done] exited with code=0 in 1.124 seconds`
 
 * ...
 
@@ -34,7 +34,7 @@ node create.js
 
 # 2种解题思路 数独：自己在文件内写入题目
 
-# 随机度较大，可能会更早获得结果
+# 随机度较大，可能会更早获得结果，但也可能陷入随机中无法自拔
 node answer.js
 # 逐个尝试并记录错误，更稳定
 node answer2.js

@@ -57,12 +57,12 @@ function NumberPlaceCreate() {
             for (let r = 0; r < 9; r++) {
               NumberPlace.pop()
             }
-            return create(y - 1)
+            return Promise.resolve(y - 1).then(create)
           }
 
           // 2.1.2.2.3 重算次数累加
           Calling.time += 1
-          return create(y)
+          return Promise.resolve(y).then(create)
         }
 
         // 2.1.2.3 选一个数字

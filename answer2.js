@@ -167,20 +167,13 @@ function NumberPlaceAnswer(type = '') {
         NumberIncorrect[i] = new Set()
         NumberIncorrect[i - 1].add(NumberNeedAnswer[i - 1].num)
         NumberNeedAnswer[i - 1].num = 0
-        return setTimeout(() => {
-          answer(i - 1)
-        }, 0)
+        return Promise.resolve(i - 1).then(answer)
       }
 
       const canBe = NumberList
         .filter(number => !NumberIncorrect[i].has(number))
       const index = Math.floor(Math.random() * canBe.length)
       numPlace.num = canBe[index]
-
-      // if (i < 10) {
-      //   console.log(i)
-      //   console.log(canBe)
-      // }
     }
 
     // 3.2 渲染成表格

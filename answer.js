@@ -126,15 +126,13 @@ function NumberPlaceAnswer(type = '') {
           if (numDel) numDel.num = 0
         }
 
-        return setTimeout(() => {
-          if (y !== 1) {
-            Calling[y - 1].time += 1
-            answer(y - 1)
-          } else {
-            Calling[1].time = 0
-            answer()
-          }
-        }, 0)
+        if (y !== 1) {
+          Calling[y - 1].time += 1
+          return Promise.resolve(y - 1).then(answer)
+        }
+
+        Calling[1].time = 0
+        return Promise.resolve().then(answer)
       }
 
       // 3.1.3 逐个尝试
@@ -185,7 +183,7 @@ function NumberPlaceAnswer(type = '') {
 
           // 重算次数累加
           Calling[y].time += 1
-          return answer(y)
+          return Promise.resolve(y).then(answer)
         }
 
         // 选一个数字
@@ -218,4 +216,4 @@ function NumberPlaceAnswer(type = '') {
   return answer()
 }
 
-NumberPlaceAnswer()
+NumberPlaceAnswer('x')
