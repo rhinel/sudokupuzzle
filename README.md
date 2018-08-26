@@ -23,7 +23,7 @@
 
 * [不规则数独] `[Done] exited with code=0 in 1.124 seconds`
 
-* ...
+* [X对角线不规则数独] `[Done] exited with code=0 in 1.662 seconds`
 
 有时间补充一下生成各个级别题目的算法。
 
