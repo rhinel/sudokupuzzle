@@ -216,4 +216,4 @@ function NumberPlaceAnswer(type = '') {
   return answer()
 }
 
-NumberPlaceAnswer('x')
+NumberPlaceAnswer()
